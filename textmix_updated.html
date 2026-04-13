@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TextMix</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+[data-theme="dark"] {
+  --bg: #0a0a0a; --bg2: #111111; --bg3: #1a1a1a;
+  --text: #ffffff; --text2: #cccccc;
+  --gray: #888888; --gray2: #333333; --gray3: #222222;
+  --green: #00ff88; --red: #ff4466; --orange: #ff9f43;
+  --card-border: #333333; --card-bg: #111111;
+  --btn-bg: #ffffff; --btn-text: #0a0a0a;
+  --header-bg: rgba(10,10,10,0.92);
+}
+[data-theme="light"] {
+  --bg: #f5f5f5; --bg2: #ffffff; --bg3: #eaeaea;
+  --text: #111111; --text2: #333333;
+  --gray: #777777; --gray2: #dddddd; --gray3: #eeeeee;
+  --green: #00b368; --red: #e63950; --orange: #e67e22;
+  --card-border: #dddddd; --card-bg: #ffffff;
+  --btn-bg: #111111; --btn-text: #ffffff;
+  --header-bg: rgba(245,245,245,0.92);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; transition: background 0.4s, color 0.4s; }
+
+#welcome-screen { position: fixed; inset: 0; z-index: 1000; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }
+.welcome-bg { position: absolute; inset: 0; pointer-events: none; }
+.welcome-circle { position: absolute; border-radius: 50%; border: 1px solid currentColor; opacity: 0.06; color: var(--text); animation: pulseCircle 4s ease-in-out infinite; }
+.welcome-circle:nth-child(1) { width: 280px; height: 280px; top: 50%; left: 50%; transform: translate(-50%,-50%); }
+.welcome-circle:nth-child(2) { width: 460px; height: 460px; top: 50%; left: 50%; transform: translate(-50%,-50%); animation-delay: 0.4s; }
+.welcome-circle:nth-child(3) { width: 640px; height: 640px; top: 50%; left: 50%; transform: translate(-50%,-50%); animation-delay: 0.8s; }
+.welcome-circle:nth-child(4) { width: 820px; height: 820px; top: 50%; left: 50%; transform: translate(-50%,-50%); animation-delay: 1.2s; }
+.welcome-circle:nth-child(5) { width: 1000px; height: 1000px; top: 50%; left: 50%; transform: translate(-50%,-50%); animation-delay: 1.6s; }
+@keyframes pulseCircle { 0%,100% { opacity: 0.04; transform: translate(-50%,-50%) scale(1); } 50% { opacity: 0.1; transform: translate(-50%,-50%) scale(1.03); } }
+
+.welcome-content { position: relative; z-index: 2; text-align: center; }
+.welcome-logo-wrap { margin-bottom: 12px; animation: wLogoIn 1.2s cubic-bezier(0.16,1,0.3,1) forwards; opacity: 0; }
+.welcome-logo { font-family: 'Space Mono', monospace; font-size: 80px; font-weight: 700; letter-spacing: -3px; background: linear-gradient(135deg, var(--text) 0%, var(--gray) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.welcome-dot { display: inline-block; width: 14px; height: 14px; background: var(--green); border-radius: 50%; margin-left: 4px; vertical-align: super; animation: dotPulse 2s ease infinite; }
+@keyframes dotPulse { 0%,100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.3); opacity: 0.6; } }
+.welcome-tagline { font-size: 14px; color: var(--gray); font-weight: 400; letter-spacing: 6px; text-transform: uppercase; margin-bottom: 56px; animation: wFadeUp 1s ease 0.3s forwards; opacity: 0; }
+.welcome-divider { width: 40px; height: 1px; background: var(--gray2); margin: 0 auto 40px; animation: wFadeUp 1s ease 0.45s forwards; opacity: 0; }
+.lang-buttons { display: flex; gap: 14px; animation: wFadeUp 1s ease 0.6s forwards; opacity: 0; }
+.lang-btn { background: transparent; border: 1px solid var(--gray2); color: var(--text); padding: 14px 44px; font-family: 'Outfit', sans-serif; font-size: 15px; font-weight: 500; border-radius: 14px; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; gap: 10px; }
+.lang-btn:hover { background: var(--btn-bg); color: var(--btn-text); border-color: var(--btn-bg); transform: translateY(-3px); box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
+.lang-btn svg { width: 18px; height: 18px; }
+@keyframes wLogoIn { from { opacity: 0; transform: translateY(30px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes wFadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+#app { display: none; min-height: 100vh; animation: fadeIn 0.5s ease; }
+.app-header { padding: 18px 24px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--gray2); position: sticky; top: 0; z-index: 100; background: var(--header-bg); backdrop-filter: blur(20px); transition: background 0.4s; }
+.app-logo { font-family: 'Space Mono', monospace; font-size: 22px; font-weight: 700; color: var(--text); }
+.app-logo span { color: var(--gray); }
+.header-stat { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--gray); font-family: 'Space Mono', monospace; }
+.header-stat svg { width: 16px; height: 16px; }
+.tabs { display: flex; gap: 8px; padding: 14px 24px; overflow-x: auto; }
+.tab-btn { background: var(--bg3); border: 1px solid var(--gray2); color: var(--gray); padding: 11px 22px; font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 500; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; white-space: nowrap; display: flex; align-items: center; gap: 8px; }
+.tab-btn:hover { border-color: var(--text); color: var(--text); }
+.tab-btn.active { background: var(--btn-bg); color: var(--btn-text); border-color: var(--btn-bg); }
+.tab-btn svg { width: 17px; height: 17px; }
+.content { padding: 0 24px 100px; max-width: 640px; margin: 0 auto; }
+
+.create-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 24px; margin-top: 16px; transition: background 0.4s, border-color 0.4s; }
+.create-card h2 { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
+.create-card p { font-size: 13px; color: var(--gray); margin-bottom: 20px; }
+.create-textarea { width: 100%; min-height: 160px; background: var(--bg); border: 1px solid var(--gray2); border-radius: 12px; padding: 16px; color: var(--text); font-family: 'Outfit', sans-serif; font-size: 15px; line-height: 1.6; resize: vertical; transition: border-color 0.3s, background 0.4s; }
+.create-textarea:focus { outline: none; border-color: var(--gray); }
+.create-textarea::placeholder { color: var(--gray); }
+.create-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 16px; }
+.char-count { font-size: 13px; color: var(--gray); font-family: 'Space Mono', monospace; }
+.publish-btn { background: var(--btn-bg); color: var(--btn-text); border: none; padding: 12px 32px; font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 600; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; gap: 8px; }
+.publish-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,0,0,0.2); }
+.publish-btn:disabled { opacity: 0.3; cursor: not-allowed; transform: none; box-shadow: none; }
+.publish-btn svg { width: 18px; height: 18px; }
+
+/* GOLDEN POST TOGGLE */
+.gold-section { margin-top: 16px; padding: 16px; background: var(--bg); border: 1px solid var(--gray2); border-radius: 14px; }
+.gold-toggle-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.gold-label { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 500; }
+.gold-icon { font-size: 18px; }
+.gold-count { font-size: 12px; color: #d4a017; font-family: 'Space Mono', monospace; background: rgba(212,160,23,0.1); border: 1px solid rgba(212,160,23,0.2); padding: 3px 10px; border-radius: 8px; }
+.gold-switch { position: relative; width: 48px; height: 26px; cursor: pointer; }
+.gold-switch input { display: none; }
+.gold-slider { position: absolute; inset: 0; background: var(--gray2); border-radius: 26px; transition: all 0.3s; }
+.gold-slider::before { content: ''; position: absolute; width: 20px; height: 20px; left: 3px; top: 3px; background: var(--gray); border-radius: 50%; transition: all 0.3s; }
+.gold-switch input:checked + .gold-slider { background: linear-gradient(135deg, #d4a017, #f5c842); }
+.gold-switch input:checked + .gold-slider::before { transform: translateX(22px); background: #fff; }
+.gold-switch input:disabled + .gold-slider { opacity: 0.3; cursor: not-allowed; }
+.gold-info-row { display: flex; gap: 8px; margin-top: 10px; }
+.gold-info-btn { background: transparent; border: 1px solid var(--gray2); color: var(--gray); padding: 6px 14px; font-family: 'Outfit', sans-serif; font-size: 12px; border-radius: 8px; cursor: pointer; transition: all 0.3s; }
+.gold-info-btn:hover { border-color: #d4a017; color: #d4a017; }
+
+/* GOLDEN POST CARD */
+.post-card.golden { background: linear-gradient(145deg, #1a1400 0%, #2a1f00 50%, #1a1400 100%); border-color: rgba(212,160,23,0.3); }
+.post-card.golden::before { background: linear-gradient(90deg, #d4a017 0%, #f5c842 50%, transparent 100%); opacity: 0.4; }
+.post-card.golden .post-avatar { background: rgba(212,160,23,0.15); }
+.post-card.golden .post-date { color: #d4a017; }
+[data-theme="light"] .post-card.golden { background: linear-gradient(145deg, #fffbe6 0%, #fff3c4 50%, #fffbe6 100%); border-color: rgba(212,160,23,0.4); }
+.golden-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; color: #d4a017; background: rgba(212,160,23,0.12); border: 1px solid rgba(212,160,23,0.25); padding: 2px 8px; border-radius: 6px; font-weight: 600; margin-left: 8px; letter-spacing: 0.5px; }
+.my-post-card.golden-my { border-left: 3px solid #d4a017; }
+
+.post-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 28px; margin-top: 16px; animation: cardAppear 0.5s ease; position: relative; overflow: hidden; transition: background 0.4s, border-color 0.4s; }
+.post-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--text) 0%, transparent 100%); opacity: 0.06; }
+.post-meta { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+.post-avatar { width: 36px; height: 36px; border-radius: 10px; background: var(--bg3); display: flex; align-items: center; justify-content: center; transition: background 0.4s; }
+.post-avatar svg { width: 18px; height: 18px; color: var(--gray); }
+.post-date { font-size: 13px; color: var(--gray); }
+.post-content { font-size: 17px; line-height: 1.7; font-weight: 300; margin-bottom: 24px; word-wrap: break-word; }
+.post-actions { display: flex; gap: 12px; align-items: center; }
+.action-btn { background: var(--bg); border: 1px solid var(--gray2); color: var(--gray); width: 56px; height: 56px; border-radius: 14px; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; }
+.action-btn svg { width: 24px; height: 24px; transition: all 0.3s; }
+.action-btn.like:hover { border-color: var(--green); color: var(--green); background: rgba(0,200,100,0.06); }
+.action-btn.dislike:hover { border-color: var(--red); color: var(--red); background: rgba(255,68,102,0.06); }
+.action-btn.liked { border-color: var(--green); color: var(--green); background: rgba(0,200,100,0.1); }
+.action-btn.disliked { border-color: var(--red); color: var(--red); background: rgba(255,68,102,0.1); }
+.action-btn.report { width: 44px; height: 44px; border-radius: 12px; margin-left: auto; }
+.action-btn.report svg { width: 18px; height: 18px; }
+.action-btn.report:hover { border-color: var(--orange); color: var(--orange); background: rgba(255,159,67,0.06); }
+.action-btn.reported { border-color: var(--orange); color: var(--orange); background: rgba(255,159,67,0.1); pointer-events: none; }
+.reaction-hint { text-align: center; margin-top: 14px; font-size: 13px; color: var(--gray); display: flex; align-items: center; justify-content: center; gap: 6px; animation: fadeIn 0.5s ease 0.3s forwards; opacity: 0; }
+.reaction-hint svg { width: 14px; height: 14px; }
+
+/* COMMENTS */
+.comments-section { margin-top: 20px; border-top: 1px solid var(--gray2); padding-top: 16px; }
+.comments-toggle { background: transparent; border: none; color: var(--gray); font-family: 'Outfit', sans-serif; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 6px; padding: 0; transition: color 0.2s; }
+.comments-toggle:hover { color: var(--text); }
+.comments-toggle svg { width: 15px; height: 15px; }
+.comments-list { margin-top: 14px; display: flex; flex-direction: column; gap: 10px; }
+.comment-item { background: var(--bg3); border: 1px solid var(--gray2); border-radius: 12px; padding: 12px 14px; animation: cardAppear 0.3s ease; }
+.comment-meta { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.comment-date { font-size: 12px; color: var(--gray); font-family: 'Space Mono', monospace; }
+.comment-report-btn { background: transparent; border: none; color: var(--gray); cursor: pointer; padding: 2px 6px; border-radius: 6px; font-size: 11px; transition: all 0.2s; display: flex; align-items: center; gap: 4px; }
+.comment-report-btn:hover { color: var(--orange); }
+.comment-report-btn.done { color: var(--orange); pointer-events: none; }
+.comment-report-btn svg { width: 12px; height: 12px; }
+.comment-text { font-size: 14px; line-height: 1.5; font-weight: 300; color: var(--text2); word-wrap: break-word; }
+.comment-input-wrap { margin-top: 12px; display: flex; gap: 8px; }
+.comment-input { flex: 1; background: var(--bg); border: 1px solid var(--gray2); border-radius: 10px; padding: 10px 14px; color: var(--text); font-family: 'Outfit', sans-serif; font-size: 14px; resize: none; height: 42px; transition: border-color 0.2s, height 0.2s; overflow: hidden; }
+.comment-input:focus { outline: none; border-color: var(--gray); height: 80px; }
+.comment-input::placeholder { color: var(--gray); }
+.comment-send-btn { background: var(--btn-bg); color: var(--btn-text); border: none; border-radius: 10px; padding: 10px 16px; font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; white-space: nowrap; align-self: flex-start; }
+.comment-send-btn:hover { opacity: 0.85; }
+.comment-send-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+.comments-loading { font-size: 13px; color: var(--gray); padding: 8px 0; display: flex; align-items: center; gap: 8px; }
+
+@keyframes cardAppear { from { opacity: 0; transform: translateY(30px) scale(0.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+.loading-spinner { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 80px 0; color: var(--gray); gap: 16px; }
+.spinner { width: 32px; height: 32px; border: 2px solid var(--gray2); border-top-color: var(--text); border-radius: 50%; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.empty-state { text-align: center; padding: 80px 20px; color: var(--gray); }
+.empty-state svg { width: 48px; height: 48px; margin-bottom: 16px; opacity: 0.4; }
+.empty-state h3 { font-size: 18px; color: var(--text); margin-bottom: 8px; }
+.empty-state p { font-size: 14px; }
+.my-post-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 20px 24px; margin-top: 12px; animation: cardAppear 0.4s ease; transition: opacity 0.3s, transform 0.3s, background 0.4s; }
+.my-post-content { font-size: 15px; line-height: 1.6; font-weight: 300; margin-bottom: 16px; word-wrap: break-word; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.my-post-stats { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.stat { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--gray); font-family: 'Space Mono', monospace; }
+.stat svg { width: 16px; height: 16px; }
+.stat.likes { color: var(--green); }
+.stat.dislikes { color: var(--red); }
+.delete-btn { background: transparent; border: 1px solid rgba(255,68,102,0.3); color: var(--red); padding: 8px 16px; font-family: 'Outfit', sans-serif; font-size: 12px; font-weight: 500; border-radius: 8px; cursor: pointer; transition: all 0.3s; margin-left: auto; display: flex; align-items: center; gap: 6px; }
+.delete-btn:hover { background: rgba(255,68,102,0.1); border-color: var(--red); }
+.delete-btn svg { width: 14px; height: 14px; }
+.settings-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 24px; margin-top: 16px; transition: background 0.4s, border-color 0.4s; }
+.settings-card h2 { font-size: 18px; font-weight: 600; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+.settings-card h2 svg { width: 20px; height: 20px; }
+.setting-row { display: flex; align-items: center; justify-content: space-between; padding: 16px 0; border-bottom: 1px solid var(--gray2); }
+.setting-row:last-child { border-bottom: none; }
+.setting-label { font-size: 15px; font-weight: 400; }
+.setting-desc { font-size: 12px; color: var(--gray); margin-top: 2px; }
+.toggle-group { display: flex; gap: 6px; }
+.toggle-btn { background: var(--bg3); border: 1px solid var(--gray2); color: var(--gray); padding: 8px 18px; font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 500; border-radius: 10px; cursor: pointer; transition: all 0.3s; }
+.toggle-btn:hover { border-color: var(--text); color: var(--text); }
+.toggle-btn.active { background: var(--btn-bg); color: var(--btn-text); border-color: var(--btn-bg); }
+.modal-overlay { position: fixed; inset: 0; z-index: 500; background: rgba(0,0,0,0.75); backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; padding: 24px; animation: fadeIn 0.3s ease; }
+.modal { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 32px; width: 100%; max-width: 480px; animation: cardAppear 0.4s ease; }
+.modal h2 { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+.modal p { font-size: 14px; color: var(--gray); margin-bottom: 20px; line-height: 1.5; }
+.modal .create-textarea { min-height: 120px; }
+.modal-actions { display: flex; gap: 12px; margin-top: 16px; justify-content: flex-end; }
+.modal-close { background: var(--bg3); border: 1px solid var(--gray2); color: var(--text); padding: 10px 24px; border-radius: 12px; font-family: 'Outfit', sans-serif; font-size: 14px; cursor: pointer; transition: all 0.3s; }
+.modal-close:hover { border-color: var(--text); }
+.toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--btn-bg); color: var(--btn-text); padding: 14px 28px; border-radius: 12px; font-size: 14px; font-weight: 500; z-index: 9999; transition: transform 0.4s cubic-bezier(0.16,1,0.3,1); display: flex; align-items: center; gap: 8px; }
+.toast.show { transform: translateX(-50%) translateY(0); }
+.toast svg { width: 18px; height: 18px; }
+
+@media (max-width: 480px) {
+  .welcome-logo { font-size: 56px; }
+  .lang-buttons { flex-direction: column; width: 85%; }
+  .lang-btn { justify-content: center; }
+  .tabs { padding: 12px 16px; gap: 6px; }
+  .tab-btn { padding: 10px 14px; font-size: 13px; }
+  .content { padding: 0 16px 100px; }
+  .post-card, .create-card, .settings-card { padding: 20px; }
+  .gold-toggle-row { flex-wrap: wrap; }
+}
+.hidden { display: none !important; }
+</style>
+</head>
+<body data-theme="dark">
+
+<div id="welcome-screen">
+  <div class="welcome-bg"><div class="welcome-circle"></div><div class="welcome-circle"></div><div class="welcome-circle"></div><div class="welcome-circle"></div><div class="welcome-circle"></div></div>
+  <div class="welcome-content">
+    <div class="welcome-logo-wrap"><span class="welcome-logo">TextMix</span><span class="welcome-dot"></span></div>
+    <div class="welcome-tagline">Mix your thoughts</div>
+    <div class="welcome-divider"></div>
+    <div class="lang-buttons">
+      <button class="lang-btn" onclick="setLang('ru')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15 15 0 010 20M12 2a15 15 0 000 20"/></svg>Русский</button>
+      <button class="lang-btn" onclick="setLang('en')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15 15 0 010 20M12 2a15 15 0 000 20"/></svg>English</button>
+    </div>
+  </div>
+</div>
+
+<div id="app">
+  <header class="app-header">
+    <div class="app-logo">Text<span>Mix</span></div>
+    <div class="header-stat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg><span data-i18n="posts_created">Создано постов:</span>&nbsp;<span id="total-count">...</span></div>
+  </header>
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="create" onclick="switchTab('create')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg><span data-i18n="tab_create">Создать</span></button>
+    <button class="tab-btn" data-tab="feed" onclick="switchTab('feed')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/></svg><span data-i18n="tab_feed">Рандом</span></button>
+    <button class="tab-btn" data-tab="my" onclick="switchTab('my')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M6 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/></svg><span data-i18n="tab_my">Мои</span></button>
+    <button class="tab-btn" data-tab="settings" onclick="switchTab('settings')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg><span data-i18n="tab_settings">⚙</span></button>
+  </div>
+
+  <div class="content" id="content-create">
+    <div class="create-card">
+      <h2 data-i18n="create_title">Новый пост</h2>
+      <p data-i18n="create_desc">Напиши что угодно — мысль, историю, цитату...</p>
+      <textarea class="create-textarea" id="post-input" maxlength="2000" data-i18n-placeholder="create_placeholder" placeholder="О чём ты думаешь?"></textarea>
+      <div class="gold-section">
+        <div class="gold-toggle-row">
+          <div class="gold-label"><span class="gold-icon">✨</span> <span data-i18n="gold_activate">Золотой пост</span></div>
+          <span class="gold-count" id="gold-count-display">0</span>
+          <label class="gold-switch"><input type="checkbox" id="gold-checkbox" disabled><span class="gold-slider"></span></label>
+        </div>
+        <div class="gold-info-row">
+          <button class="gold-info-btn" onclick="showGoldInfo()"><span data-i18n="gold_what">Что делает золотой пост?</span></button>
+          <button class="gold-info-btn" onclick="showGoldHow()"><span data-i18n="gold_how">Как получить?</span></button>
+        </div>
+      </div>
+      <div class="create-footer">
+        <span class="char-count"><span id="char-count">0</span> / 2000</span>
+        <button class="publish-btn" id="publish-btn" disabled onclick="publishPost()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg><span data-i18n="publish">Опубликовать</span></button>
+      </div>
+    </div>
+  </div>
+  <div class="content hidden" id="content-feed"></div>
+  <div class="content hidden" id="content-my"></div>
+  <div class="content hidden" id="content-settings">
+    <div class="settings-card">
+      <h2><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg><span data-i18n="tab_settings">Настройки</span></h2>
+      <div class="setting-row"><div><div class="setting-label" data-i18n="setting_theme">Тема</div><div class="setting-desc" data-i18n="setting_theme_desc">Внешний вид приложения</div></div><div class="toggle-group" id="theme-toggle"><button class="toggle-btn active" data-val="dark" onclick="setTheme('dark')"><span data-i18n="theme_dark">Тёмная</span></button><button class="toggle-btn" data-val="light" onclick="setTheme('light')"><span data-i18n="theme_light">Светлая</span></button></div></div>
+      <div class="setting-row"><div><div class="setting-label" data-i18n="setting_lang">Язык</div><div class="setting-desc" data-i18n="setting_lang_desc">Язык интерфейса</div></div><div class="toggle-group" id="lang-toggle"><button class="toggle-btn active" data-val="ru" onclick="changeLang('ru')">RU</button><button class="toggle-btn" data-val="en" onclick="changeLang('en')">EN</button></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODALS -->
+<div class="modal-overlay hidden" id="write-modal">
+  <div class="modal">
+    <h2 data-i18n="modal_title">✍️ Твоя очередь!</h2>
+    <p data-i18n="modal_desc">Напиши свой пост, чтобы продолжить смотреть записи других людей.</p>
+    <textarea class="create-textarea" id="modal-input" maxlength="2000" data-i18n-placeholder="create_placeholder" placeholder="О чём ты думаешь?"></textarea>
+    <div class="modal-actions"><button class="publish-btn" id="modal-publish-btn" disabled onclick="publishFromModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg><span data-i18n="publish">Опубликовать</span></button></div>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="gold-info-modal">
+  <div class="modal">
+    <h2>✨ <span data-i18n="gold_info_title">Золотой пост</span></h2>
+    <p data-i18n="gold_info_text">Золотой пост отображается всем пользователям с золотым оформлением и имеет ×2 шанс попасть в рекомендации!</p>
+    <div class="modal-actions"><button class="modal-close" onclick="document.getElementById('gold-info-modal').classList.add('hidden')">OK</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="gold-how-modal">
+  <div class="modal">
+    <h2>🎁 <span data-i18n="gold_how_title">Как получить?</span></h2>
+    <p data-i18n="gold_how_text">Создайте 3 поста для получения 1 золотого! Каждые 3 опубликованных поста дают вам 1 золотой пост.</p>
+    <div class="modal-actions"><button class="modal-close" onclick="document.getElementById('gold-how-modal').classList.add('hidden')">OK</button></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+var SB='https://nanwjsiyfshxbdrjzbmm.supabase.co/rest/v1';
+var KEY='sb_publishable_0GVdj8q7qBWYnRm0STCizg_tBSZuNMA';
+var _s={};
+function sGet(k){try{return localStorage.getItem(k)}catch(e){return _s[k]||null}}
+function sSet(k,v){_s[k]=v;try{localStorage.setItem(k,v)}catch(e){}}
+var userId=sGet('tm_uid');
+if(!userId){userId='u_'+Date.now()+'_'+Math.random().toString(36).substr(2,9);sSet('tm_uid',userId)}
+
+async function sb_api(path,opt){
+  opt=opt||{};
+  var r=await fetch(SB+'/'+path,{method:opt.method||'GET',mode:'cors',headers:{'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'application/json','Prefer':opt.prefer||'return=representation'},body:opt.body?JSON.stringify(opt.body):undefined});
+  if(!r.ok){var e=await r.text();throw new Error(r.status+' '+e)}
+  var txt=await r.text();return txt?JSON.parse(txt):null;
+}
+
+var lang='ru';
+var i18n={
+  ru:{tab_create:'Создать',tab_feed:'Рандом',tab_my:'Мои',tab_settings:'Настройки',create_title:'Новый пост',create_desc:'Напиши что угодно — мысль, историю, цитату...',create_placeholder:'О чём ты думаешь?',publish:'Опубликовать',modal_title:'✍️ Твоя очередь!',modal_desc:'Напиши свой пост, чтобы продолжить смотреть записи других людей.',loading:'Загрузка...',empty_feed:'Пока нет постов',empty_feed_desc:'Будь первым — создай пост!',empty_my:'У тебя нет постов',empty_my_desc:'Создай свой первый пост!',published:'Пост опубликован!',published_gold:'Золотой пост опубликован! ✨',deleted:'Пост удалён',views:'просм.',no_more:'Постов больше нет',no_more_desc:'Возвращайся позже или создай свой!',delete_confirm:'Удалить этот пост?',del:'Удалить',reaction_hint:'Поставьте реакцию для просмотра следующего поста',posts_created:'Создано постов:',setting_theme:'Тема',setting_theme_desc:'Внешний вид приложения',theme_dark:'Тёмная',theme_light:'Светлая',setting_lang:'Язык',setting_lang_desc:'Язык интерфейса',report:'Пожаловаться',reported:'Жалоба отправлена',gold_activate:'Золотой пост',gold_what:'Что делает золотой пост?',gold_how:'Как получить?',gold_info_title:'Золотой пост',gold_info_text:'Золотой пост отображается всем пользователям с золотым оформлением и имеет ×2 шанс попасть в рекомендации!',gold_how_title:'Как получить?',gold_how_text:'Создайте 3 поста для получения 1 золотого! Каждые 3 опубликованных поста дают вам 1 золотой пост.',gold_badge:'GOLDEN',comments_show:'Комментарии',comment_placeholder:'Написать комментарий...',comment_send:'Отправить',comment_reported:'Жалоба отправлена',comment_empty:'Пока нет комментариев',comment_report:'Пожаловаться'},
+  en:{tab_create:'Create',tab_feed:'Random',tab_my:'My Posts',tab_settings:'Settings',create_title:'New Post',create_desc:'Write anything — a thought, a story, a quote...',create_placeholder:'What\'s on your mind?',publish:'Publish',modal_title:'✍️ Your turn!',modal_desc:'Write a post to keep browsing other people\'s entries.',loading:'Loading...',empty_feed:'No posts yet',empty_feed_desc:'Be the first — create a post!',empty_my:'You have no posts',empty_my_desc:'Create your first post!',published:'Post published!',published_gold:'Golden post published! ✨',deleted:'Post deleted',views:'views',no_more:'No more posts',no_more_desc:'Come back later or create your own!',delete_confirm:'Delete this post?',del:'Delete',reaction_hint:'React to see the next post',posts_created:'Posts created:',setting_theme:'Theme',setting_theme_desc:'App appearance',theme_dark:'Dark',theme_light:'Light',setting_lang:'Language',setting_lang_desc:'Interface language',report:'Report',reported:'Report sent',gold_activate:'Golden post',gold_what:'What does a golden post do?',gold_how:'How to get one?',gold_info_title:'Golden Post',gold_info_text:'A golden post is displayed to all users with a golden design and has a ×2 chance of appearing in recommendations!',gold_how_title:'How to get one?',gold_how_text:'Create 3 posts to earn 1 golden post! Every 3 published posts give you 1 golden post.',gold_badge:'GOLDEN',comments_show:'Comments',comment_placeholder:'Write a comment...',comment_send:'Send',comment_reported:'Report sent',comment_empty:'No comments yet',comment_report:'Report'}
+};
+
+function t(k){return i18n[lang][k]||k}
+function applyLang(){
+  document.querySelectorAll('[data-i18n]').forEach(function(el){var k=el.getAttribute('data-i18n');if(i18n[lang][k])el.textContent=i18n[lang][k]});
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(function(el){var k=el.getAttribute('data-i18n-placeholder');if(i18n[lang][k])el.placeholder=i18n[lang][k]});
+  document.querySelectorAll('#lang-toggle .toggle-btn').forEach(function(b){b.classList.toggle('active',b.dataset.val===lang)});
+}
+function setLang(l){lang=l;sSet('tm_lang',l);var ws=document.getElementById('welcome-screen');ws.style.transition='opacity 0.4s';ws.style.opacity='0';setTimeout(function(){ws.classList.add('hidden');document.getElementById('app').style.display='block';applyLang();loadTotalCount();updateGoldCount()},400)}
+function changeLang(l){lang=l;sSet('tm_lang',l);applyLang()}
+var theme=sGet('tm_theme')||'dark';
+function setTheme(t){theme=t;sSet('tm_theme',t);document.body.setAttribute('data-theme',t);document.querySelectorAll('#theme-toggle .toggle-btn').forEach(function(b){b.classList.toggle('active',b.dataset.val===t)})}
+
+function switchTab(tab){
+  document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.toggle('active',b.dataset.tab===tab)});
+  ['create','feed','my','settings'].forEach(function(id){document.getElementById('content-'+id).classList.toggle('hidden',id!==tab)});
+  if(tab==='feed')loadRandomPost();if(tab==='my')loadMyPosts();if(tab==='create')updateGoldCount();
+}
+
+async function loadTotalCount(){try{var all=await sb_api('texts?select=id');document.getElementById('total-count').textContent=all?all.length:0}catch(e){document.getElementById('total-count').textContent='—'}}
+
+// GOLD SYSTEM
+var goldTokens=parseInt(sGet('tm_gold')||'0');
+var totalCreated=parseInt(sGet('tm_created')||'0');
+
+async function updateGoldCount(){
+  // Count user's posts to calculate gold
+  try{
+    var myPosts=await sb_api('texts?select=id&user_id=eq.'+userId);
+    var count=myPosts?myPosts.length:0;
+    totalCreated=count;sSet('tm_created',count);
+    // Gold used
+    var goldUsed=parseInt(sGet('tm_gold_used')||'0');
+    var earned=Math.floor(count/3);
+    goldTokens=Math.max(0,earned-goldUsed);
+    document.getElementById('gold-count-display').textContent=goldTokens;
+    var cb=document.getElementById('gold-checkbox');
+    cb.disabled=goldTokens<=0;
+    if(goldTokens<=0)cb.checked=false;
+  }catch(e){console.error(e)}
+}
+
+function showGoldInfo(){document.getElementById('gold-info-modal').classList.remove('hidden')}
+function showGoldHow(){document.getElementById('gold-how-modal').classList.remove('hidden')}
+
+// CREATE
+var postInput=document.getElementById('post-input');var charCount=document.getElementById('char-count');var publishBtn=document.getElementById('publish-btn');
+postInput.addEventListener('input',function(){charCount.textContent=postInput.value.length;publishBtn.disabled=postInput.value.trim().length===0});
+
+async function publishPost(){
+  var content=postInput.value.trim();if(!content)return;publishBtn.disabled=true;
+  var useGold=document.getElementById('gold-checkbox').checked&&goldTokens>0;
+  try{
+    await sb_api('texts',{method:'POST',body:{content:content,user_id:userId,likes:0,dislikes:0,views:0,is_golden:useGold}});
+    if(useGold){
+      var used=parseInt(sGet('tm_gold_used')||'0')+1;
+      sSet('tm_gold_used',used);
+      document.getElementById('gold-checkbox').checked=false;
+    }
+    postInput.value='';charCount.textContent='0';
+    showToast(useGold?t('published_gold'):t('published'),'success');
+    postsViewedCount=0;loadTotalCount();updateGoldCount();
+  }catch(e){console.error(e);showToast('Error: '+e.message,'error')}
+  publishBtn.disabled=false;
+}
+
+// FEED
+var currentPost=null;var seenPostIds=[];var postsViewedCount=0;
+
+async function loadRandomPost(){
+  var feed=document.getElementById('content-feed');
+  feed.innerHTML='<div class="loading-spinner"><div class="spinner"></div><span>'+t('loading')+'</span></div>';
+  try{
+    var allPosts=await sb_api('texts?select=id,is_golden&user_id=neq.'+userId);
+    if(!allPosts||allPosts.length===0){feed.innerHTML='<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg><h3>'+t('empty_feed')+'</h3><p>'+t('empty_feed_desc')+'</p></div>';return}
+    var unseen=allPosts.filter(function(p){return seenPostIds.indexOf(p.id)===-1});
+    if(unseen.length===0){seenPostIds=[];unseen=allPosts}
+
+    // Weighted random: golden posts appear twice in the pool
+    var pool=[];
+    unseen.forEach(function(p){pool.push(p);if(p.is_golden)pool.push(p)});
+    var pick=pool[Math.floor(Math.random()*pool.length)];
+
+    var postArr=await sb_api('texts?id=eq.'+pick.id+'&select=*');
+    var post=postArr[0];currentPost=post;seenPostIds.push(post.id);
+    sb_api('texts?id=eq.'+post.id,{method:'PATCH',prefer:'return=minimal',body:{views:(post.views||0)+1}}).catch(function(){});
+    var d=new Date(post.created_at);
+    var date=d.toLocaleDateString(lang==='ru'?'ru-RU':'en-US',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+    var isGold=post.is_golden;
+    var goldBadge=isGold?'<span class="golden-badge">✨ '+t('gold_badge')+'</span>':'';
+
+    feed.innerHTML='<div class="post-card'+(isGold?' golden':'')+'"><div class="post-meta"><div class="post-avatar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div><div class="post-date">'+date+goldBadge+'</div></div><div class="post-content">'+esc(post.content).replace(/\n/g,'<br>')+'</div><div class="post-actions"><button class="action-btn like" onclick="react(\'like\',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 9V5a3 3 0 00-3-3l-4 9v11h11.28a2 2 0 002-1.7l1.38-9a2 2 0 00-2-2.3H14z"/><path d="M7 22H4a2 2 0 01-2-2v-7a2 2 0 012-2h3"/></svg></button><button class="action-btn dislike" onclick="react(\'dislike\',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 15v4a3 3 0 003 3l4-9V2H5.72a2 2 0 00-2 1.7l-1.38 9a2 2 0 002 2.3H10z"/><path d="M17 2h2.67A2.31 2.31 0 0122 4v7a2.31 2.31 0 01-2.33 2H17"/></svg></button><button class="action-btn report" onclick="reportPost(this)" title="'+t('report')+'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></button></div><div class="reaction-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5"/></svg>'+t('reaction_hint')+'</div><div class="comments-section"><button class="comments-toggle" onclick="toggleComments(\''+post.id+'\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>'+t('comments_show')+'</button><div class="comments-list hidden" id="comments-'+post.id+'"></div><div class="comment-input-wrap" id="comment-form-'+post.id+'" style="display:none"><textarea class="comment-input" id="comment-text-'+post.id+'" placeholder="'+t('comment_placeholder')+'" maxlength="500" oninput="onCommentInput(\''+post.id+'\')"></textarea><button class="comment-send-btn" id="comment-send-'+post.id+'" disabled onclick="sendComment(\''+post.id+'\')">'+t('comment_send')+'</button></div></div></div>';
+  }catch(e){console.error(e);feed.innerHTML='<div class="empty-state"><h3>Error</h3><p>'+e.message+'</p></div>'}
+}
+
+async function react(type,btn){
+  if(!currentPost)return;
+  var btns=btn.parentElement.querySelectorAll('.action-btn:not(.report)');
+  btns.forEach(function(b){b.style.pointerEvents='none'});
+  btn.classList.add(type==='like'?'liked':'disliked');
+  var hint=btn.parentElement.parentElement.querySelector('.reaction-hint');if(hint)hint.style.opacity='0';
+  try{var field=type==='like'?'likes':'dislikes';var body={};body[field]=(currentPost[field]||0)+1;await sb_api('texts?id=eq.'+currentPost.id,{method:'PATCH',prefer:'return=minimal',body:body})}catch(e){console.error(e)}
+  postsViewedCount++;
+  setTimeout(function(){if(postsViewedCount>0&&postsViewedCount%3===0)showWriteModal();else loadRandomPost()},600);
+}
+
+async function reportPost(btn){
+  if(!currentPost)return;btn.classList.add('reported');btn.style.pointerEvents='none';
+  try{await sb_api('reports',{method:'POST',body:{post_id:currentPost.id}});showToast(t('reported'),'success')}catch(e){console.error(e);showToast('Error','error')}
+}
+
+var modalInput=document.getElementById('modal-input');var modalPubBtn=document.getElementById('modal-publish-btn');
+modalInput.addEventListener('input',function(){modalPubBtn.disabled=modalInput.value.trim().length===0});
+function showWriteModal(){document.getElementById('write-modal').classList.remove('hidden');modalInput.value='';modalPubBtn.disabled=true}
+
+async function publishFromModal(){
+  var content=modalInput.value.trim();if(!content)return;modalPubBtn.disabled=true;
+  try{await sb_api('texts',{method:'POST',body:{content:content,user_id:userId,likes:0,dislikes:0,views:0,is_golden:false}});document.getElementById('write-modal').classList.add('hidden');showToast(t('published'),'success');postsViewedCount=0;loadTotalCount();updateGoldCount();loadRandomPost()}catch(e){console.error(e);showToast('Error: '+e.message,'error');modalPubBtn.disabled=false}
+}
+
+async function loadMyPosts(){
+  var c=document.getElementById('content-my');
+  c.innerHTML='<div class="loading-spinner"><div class="spinner"></div><span>'+t('loading')+'</span></div>';
+  try{
+    var posts=await sb_api('texts?user_id=eq.'+userId+'&select=*&order=created_at.desc');
+    if(!posts||posts.length===0){c.innerHTML='<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg><h3>'+t('empty_my')+'</h3><p>'+t('empty_my_desc')+'</p></div>';return}
+    var html='';
+    posts.forEach(function(p){
+      var d=new Date(p.created_at);var date=d.toLocaleDateString(lang==='ru'?'ru-RU':'en-US',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+      var goldClass=p.is_golden?' golden-my':'';
+      var goldTag=p.is_golden?' <span class="golden-badge">✨</span>':'';
+      html+='<div class="my-post-card'+goldClass+'" id="mypost-'+p.id+'"><div class="my-post-content">'+esc(p.content).replace(/\n/g,'<br>')+goldTag+'</div><div class="my-post-stats"><span class="stat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>'+(p.views||0)+' '+t('views')+'</span><span class="stat likes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 00-3-3l-4 9v11h11.28a2 2 0 002-1.7l1.38-9a2 2 0 00-2-2.3H14z"/></svg>'+(p.likes||0)+'</span><span class="stat dislikes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 15v4a3 3 0 003 3l4-9V2H5.72a2 2 0 00-2 1.7l-1.38 9a2 2 0 002 2.3H10z"/></svg>'+(p.dislikes||0)+'</span><span class="stat">'+date+'</span><button class="delete-btn" onclick="deletePost(\''+p.id+'\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>'+t('del')+'</button></div></div>';
+    });
+    c.innerHTML=html;
+  }catch(e){console.error(e);c.innerHTML='<div class="empty-state"><h3>Error</h3><p>'+e.message+'</p></div>'}
+}
+
+async function deletePost(id){
+  if(!confirm(t('delete_confirm')))return;
+  try{await sb_api('texts?id=eq.'+id,{method:'DELETE',prefer:'return=minimal'});var el=document.getElementById('mypost-'+id);if(el){el.style.opacity='0';el.style.transform='translateX(30px)';setTimeout(function(){el.remove()},300)}showToast(t('deleted'),'success');loadTotalCount();updateGoldCount()}catch(e){console.error(e)}
+}
+
+// COMMENTS
+async function toggleComments(postId){
+  var list=document.getElementById('comments-'+postId);
+  var form=document.getElementById('comment-form-'+postId);
+  if(!list)return;
+  if(list.classList.contains('hidden')){
+    list.classList.remove('hidden');
+    if(form)form.style.display='flex';
+    await loadComments(postId);
+  } else {
+    list.classList.add('hidden');
+    if(form)form.style.display='none';
+  }
+}
+
+async function loadComments(postId){
+  var list=document.getElementById('comments-'+postId);
+  if(!list)return;
+  list.innerHTML='<div class="comments-loading"><div class="spinner" style="width:16px;height:16px;border-width:1.5px"></div>'+t('loading')+'</div>';
+  try{
+    var comments=await sb_api('comments?post_id=eq.'+postId+'&order=created_at.asc&select=*');
+    if(!comments||comments.length===0){list.innerHTML='<div style="font-size:13px;color:var(--gray);padding:4px 0">'+t('comment_empty')+'</div>';return}
+    list.innerHTML=comments.map(function(c){
+      var d=new Date(c.created_at).toLocaleString(lang==='ru'?'ru-RU':'en-US',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+      return '<div class="comment-item" id="citem-'+c.id+'"><div class="comment-meta"><span class="comment-date">'+d+'</span><button class="comment-report-btn" onclick="reportComment(\''+c.id+'\',this)" title="'+t('comment_report')+'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>'+t('comment_report')+'</button></div><div class="comment-text">'+esc(c.content).replace(/\n/g,'<br>')+'</div></div>';
+    }).join('');
+  }catch(e){list.innerHTML='<div style="font-size:13px;color:var(--red);padding:4px 0">Error: '+e.message+'</div>'}
+}
+
+function onCommentInput(postId){
+  var inp=document.getElementById('comment-text-'+postId);
+  var btn=document.getElementById('comment-send-'+postId);
+  if(btn)btn.disabled=!inp||inp.value.trim().length===0;
+}
+
+async function sendComment(postId){
+  var inp=document.getElementById('comment-text-'+postId);
+  var btn=document.getElementById('comment-send-'+postId);
+  if(!inp||!inp.value.trim())return;
+  btn.disabled=true;
+  try{
+    await sb_api('comments',{method:'POST',body:{post_id:postId,user_id:userId,content:inp.value.trim()}});
+    inp.value='';btn.disabled=true;
+    await loadComments(postId);
+  }catch(e){showToast('Error: '+e.message,'error');btn.disabled=false}
+}
+
+async function reportComment(commentId,btn){
+  btn.classList.add('done');btn.style.pointerEvents='none';
+  try{await sb_api('comment_reports',{method:'POST',body:{comment_id:commentId}});showToast(t('comment_reported'),'success')}catch(e){console.error(e)}
+}
+
+function showToast(msg,type){var toast=document.getElementById('toast');var icon=type==='success'?'<svg viewBox="0 0 24 24" fill="none" stroke="#00cc66" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>':'<svg viewBox="0 0 24 24" fill="none" stroke="#ff4466" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>';toast.innerHTML=icon+' '+msg;toast.classList.add('show');setTimeout(function(){toast.classList.remove('show')},2500)}
+function esc(text){var d=document.createElement('div');d.textContent=text;return d.innerHTML}
+
+(function(){
+  var savedTheme=sGet('tm_theme');if(savedTheme){theme=savedTheme;document.body.setAttribute('data-theme',theme)}
+  var savedLang=sGet('tm_lang');
+  if(savedLang){lang=savedLang;document.getElementById('welcome-screen').classList.add('hidden');document.getElementById('app').style.display='block';applyLang();loadTotalCount();updateGoldCount();document.querySelectorAll('#theme-toggle .toggle-btn').forEach(function(b){b.classList.toggle('active',b.dataset.val===theme)})}
+})();
+</script>
+</body>
+</html>
